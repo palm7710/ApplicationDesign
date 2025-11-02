@@ -1,0 +1,17 @@
+# Node.js
+node_modules/
+npm-debug.log*
+
+# TypeScript
+dist/
+build/
+*.tsbuildinfo
+
+# Env
+.env
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
