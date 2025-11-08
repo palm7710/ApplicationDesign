@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
     <title>リバーシ</title>
   </head>
   <body>
@@ -10,82 +11,12 @@
       <h1>リバーシで学ぶアプリケーション設計入門</h1>
     </header>
     <main>
-      <p>白の番はスキップです</p>
-      <div>
-        <!-- 8マス -->
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <!-- 8マス -->
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <!-- 8マス -->
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <!-- 8マス -->
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <!-- 8マス -->
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <!-- 8マス -->
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <!-- 8マス -->
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <!-- 8マス -->
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
+      <div class="warning-message-area">
+        <p class="warning-message">白の番はスキップです</p>
       </div>
+      <div id="board" class="board"></div>
       <p>次は黒の番です</p>
     </main>
+    <script src="main.js"></script>
   </body>
 </html>
