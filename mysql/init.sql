@@ -44,4 +44,4 @@ create table game_results (
     winner_disc int not null,
     end_at datetime not null,
     foreign key (game_id) references games (id)
-;)
+);
