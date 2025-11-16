@@ -4,6 +4,7 @@ import "express-async-errors";
 import mysql from "mysql2/promise";
 import { createConnection } from "net";
 import { GameGateway } from "./dataaccess/gameGateway";
+import { TurnGateway } from "./dataaccess/turnGateway";
 
 const EMPTY = 0;
 const DARK = 1;
@@ -29,6 +30,7 @@ app.use(express.static("static", { extensions: ["html"] }));
 app.use(express.json());
 
 const gameGateway = new GameGateway();
+const turnGateway = new TurnGateway();
 
 app.get("/api/hello", async (req, res) => {
   res.json({
@@ -49,11 +51,13 @@ app.post("/api/games", async (req, res) => {
 
     const gameRecord = await gameGateway.insert(conn, now);
 
-    const turnInsertResult = await conn.execute<mysql.ResultSetHeader>(
-      "insert into turns (game_id, turn_count, next_disc, end_at) values (?, ?, ?, ?)",
-      [gameRecord.id, 0, DARK, now]
+    const turnRecord = await turnGateway.insert(
+      conn,
+      gameRecord.id,
+      0,
+      DARK,
+      now
     );
-    const turnId = turnInsertResult[0].insertId;
 
     const squareCount = INITIAL_BOARD.map((line) => line.length).reduce(
       (v1, v2) => v1 + v2,
@@ -68,7 +72,7 @@ app.post("/api/games", async (req, res) => {
     const squaresInsertValues: any[] = [];
     INITIAL_BOARD.forEach((line, y) => {
       line.forEach((disc, x) => {
-        squaresInsertValues.push(turnId);
+        squaresInsertValues.push(turnRecord.id);
         squaresInsertValues.push(x);
         squaresInsertValues.push(y);
         squaresInsertValues.push(disc);
@@ -95,15 +99,18 @@ app.get("/api/games/latest/turns/:turnCount", async (req, res) => {
       throw new Error("Latest game not found");
     }
 
-    const gameSelectResult = await conn.execute<mysql.RowDataPacket[]>(
-      "select id, started_at from games order by id desc limit 1",
-      [gameRecord.id, turnCount]
+    const turnRecord = await turnGateway.findForGameIdAndTurnCount(
+      conn,
+      gameRecord.id,
+      turnCount
     );
-    const game = gameSelectResult[0][0];
+    if (!turnRecord) {
+      throw new Error("Specified turn not found");
+    }
 
     const turnSelectResult = await conn.execute<mysql.RowDataPacket[]>(
       "select id, game_id, turn_count, next_disc, end_at from turns where game_id = ? and turn_count = ?",
-      [game["id"], turnCount]
+      [turnRecord.id, turnCount]
     );
 
     const turn = turnSelectResult[0][0];
@@ -122,7 +129,7 @@ app.get("/api/games/latest/turns/:turnCount", async (req, res) => {
     const responseBody = {
       turnCount,
       board,
-      nextDisc: turn["next_disc"],
+      nextDisc: turnRecord.nextDisc,
       // TODO 決着がついている場合、game_resultsテーブルから取得する
       winnerDisc: null,
     };
@@ -147,16 +154,18 @@ app.post("/api/games/latest/turns", async (req, res) => {
     }
 
     const previoustTurnCount = turnCount - 1;
-    const turnSelectResult = await conn.execute<mysql.RowDataPacket[]>(
-      "select id, game_id, turn_count, next_disc, end_at from turns where game_id = ? and turn_count = ?",
-      [gameRecord.id, previoustTurnCount]
+    const turnRecord = await turnGateway.findForGameIdAndTurnCount(
+      conn,
+      gameRecord.id,
+      previoustTurnCount
     );
-
-    const turn = turnSelectResult[0][0];
+    if (!turnRecord) {
+      throw new Error("Specified turn not found");
+    }
 
     const squaresSelectResult = await conn.execute<mysql.RowDataPacket[]>(
       "select id, turn_id, x, y, disc from squares where turn_id = ?",
-      [turn["id"]]
+      [turnRecord.id]
     );
 
     const squares = squaresSelectResult[0];
