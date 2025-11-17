@@ -8,10 +8,10 @@ export class TurnRecord {
   ) {}
 
   get id() {
-    return this._id;
+    return this._id
   }
 
   get nextDisc() {
-    return this._nextDisc;
+    return this._nextDisc
   }
 }
